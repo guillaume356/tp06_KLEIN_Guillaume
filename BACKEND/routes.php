@@ -35,3 +35,21 @@ $app->post('/register', function ($request, $response) {
         return $response->withStatus(400)->withJson(['error' => 'Failed to create user']);
     }
 });
+
+
+$app->put('/account/{id}', function ($request, $response, array $args) {
+    $userId = $args['id'];
+    $params = $request->getParsedBody();
+    $user = updateUser($userId, $params);
+    if ($user) {
+        return $response->withJson(['message' => 'User updated successfully', 'user' => $user]);
+    } else {
+        return $response->withStatus(400)->withJson(['error' => 'Failed to update user']);
+    }
+});
+
+
+$app->get('/products', function ($request, $response, array $args) {
+    $products = getProductsFromDatabase(); 
+    return $response->withJson($products);
+});
