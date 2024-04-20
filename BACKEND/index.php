@@ -1,22 +1,22 @@
 <?php
 use Slim\Factory\AppFactory;
-use App\Auth\Auth;
+use App\Models\ProductModel;
 
 require __DIR__ . '/vendor/autoload.php';
 
+// Configuration de la base de données
+$pdo = new PDO('mysql:host=localhost;dbname=your_database', 'username', 'password');
+
+// Création de l'app
 $app = AppFactory::create();
 
-$app->post('/login', function ($request, $response) {
-    $params = (array)$request->getParsedBody();
-    $username = $params['username'];
-    $password = $params['password'];
+// Injection de dépendance
+$productModel = new ProductModel($pdo);
 
-    if ($user = Auth::authenticateUser($username, $password)) {
-        $token = Auth::createToken($user);
-        return $response->withJson(['token' => $token]);
-    } else {
-        return $response->withStatus(401)->withJson(['error' => 'Invalid credentials']);
-    }
+// Route pour obtenir les produits
+$app->get('/products', function ($request, $response) use ($productModel) {
+    $products = $productModel->getProducts();
+    return $response->withJson($products);
 });
 
 $app->run();
